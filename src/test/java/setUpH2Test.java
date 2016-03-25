@@ -30,7 +30,7 @@ public class setUpH2Test {
     @BeforeClass
     public static void beforeClass() throws SQLException {
         cp = JdbcConnectionPool.
-                create("jdbc:h2:mem:~/test", "sa", "sa");
+                create("jdbc:h2:mem:~/test;MODE=Oracle", "sa", "sa");
         conn = cp.getConnection();
         cp.dispose();
     }
@@ -71,8 +71,10 @@ public class setUpH2Test {
         InputStream script = getClass().getClassLoader().getResourceAsStream(scriptName);
         RunScript.execute(conn, new InputStreamReader(script));
         QueryRunner qr = new QueryRunner();
-        String sql = "select * from MaTable where id=?";
-        MaTable results = qr.query(conn, sql, rsh,1);
-        assertThat(results.getId()).isEqualTo(1);
+        String sql = "select * from MaTable where id= :param_integer";
+        //Le pb vient du prepareStatement
+        conn.prepareStatement(sql);
+//        MaTable results = qr.query(conn, sql, rsh,1);
+//        assertThat(results.getId()).isEqualTo(1);
     }
 }
